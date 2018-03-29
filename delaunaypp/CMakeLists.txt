@@ -6,7 +6,8 @@ set(project_headers
     include/delaunaypp/delaunay.h
     include/delaunaypp/edge.h
     include/delaunaypp/point.h
-    include/delaunaypp/pointaccessor.h)
+    include/delaunaypp/pointaccessor.h
+    include/delaunaypp/triangle.h)
 
 add_library(${PROJECT_NAME} INTERFACE)
 

@@ -16,7 +16,7 @@ namespace delaunaypp {
 		using point_type = point<T, N>;
 		using reference = point<T, N>&;
 		using value_type = T;
-		using value_type_reference = T&;
+		using value_type_reference = T & ;
 		using pointer = point<T, N>*;
 
 		point();
@@ -28,7 +28,7 @@ namespace delaunaypp {
 		point(const T& x, const T& y, const T& z);
 		point(std::initializer_list<T> data);
 		point(const point_type& other);
-		point(point_type&& other);
+		point(point_type&& other) noexcept;
 
 		value_type x() const;
 		template<class S = value_type>
@@ -40,7 +40,7 @@ namespace delaunaypp {
 		value_type_reference& operator[](const std::size_t& index);
 		value_type operator[](const std::size_t& index) const;
 		reference operator=(const point_type& other);
-		reference operator=(point_type&& other);
+		reference operator=(point_type&& other) noexcept;
 		reference operator+(const point_type& other);
 		reference operator-(const point_type& other);
 		point_type operator+(const point_type& other) const;
@@ -48,7 +48,6 @@ namespace delaunaypp {
 	private:
 		std::array<T, N> mData;
 	};
-
 #pragma endregion 
 
 #pragma region Implementation
@@ -102,7 +101,7 @@ namespace delaunaypp {
 	}
 
 	template <typename T, std::size_t N>
-	point<T, N>::point(point_type&& other) :
+	point<T, N>::point(point_type&& other) noexcept :
 		mData(std::move(other.mData))
 	{
 	}
@@ -161,7 +160,7 @@ namespace delaunaypp {
 	}
 
 	template <typename T, std::size_t N>
-	point<T, N>& point<T, N>::operator=(point_type&& other)
+	point<T, N>& point<T, N>::operator=(point_type&& other) noexcept
 	{
 		if (this == &other)
 		{

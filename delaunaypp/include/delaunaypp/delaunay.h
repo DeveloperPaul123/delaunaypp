@@ -2,12 +2,12 @@
 #include <tuple>
 #include <vector>
 #include <algorithm>
+
 #include "pointaccessor.h"
+#include "triangle.h"
 
 namespace delaunaypp
 {
-	typedef std::tuple<int, int, int> triangle;
-
 	template<typename PointType, typename T = typename PointType::value_type>
 	class delaunay
 	{
