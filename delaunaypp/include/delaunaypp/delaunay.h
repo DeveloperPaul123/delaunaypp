@@ -12,10 +12,11 @@ namespace delaunaypp
 	class delaunay
 	{
 	public:
+		using TriangleType = triangle<T>;
 		explicit delaunay(std::vector<PointType> points, 
 			delaunaypp::pointaccess::base<PointType, T>& point_accessor_x = pointaccess::indexer<PointType, T>(),
 			delaunaypp::pointaccess::base<PointType, T>& point_accessor_y = pointaccess::indexer<PointType, T>());
-		std::vector<triangle> triangulate();
+		std::vector<TriangleType> triangulate();
 
 	private:
 		std::vector<PointType> _points;
@@ -32,9 +33,9 @@ namespace delaunaypp
 	}
 
 	template <typename PointType, typename T>
-	std::vector<triangle> delaunay<PointType, T>::triangulate()
+	std::vector<typename delaunay<PointType, T>::TriangleType> delaunay<PointType, T>::triangulate()
 	{
-		std::vector<triangle> triangles{};
+		std::vector<TriangleType> triangles{};
 		// sort triangles by x and then y
 		std::sort(_points.begin(), _points.end());
 

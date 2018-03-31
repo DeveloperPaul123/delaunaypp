@@ -58,6 +58,59 @@ TEST(EdgeTests, equalityTest)
 	EXPECT_TRUE(edge3 == edge3);
 }
 
+TEST(EdgeTests, midpointTest1)
+{
+	using point = point<double>;
+	point p1(0.0, -1.0);
+	point p2(0.0, 1.0);
+	
+	edge<double> edge(p1, p2);
+
+	point answer(0.0, 0.0);
+
+	EXPECT_EQ(edge.midpoint(), answer);
+}
+
+TEST(EdgeTests, midpointTest2)
+{
+	using point = point<double>;
+	point p1(-20, 0.0);
+	point p2(20.0, 0.0);
+
+	edge<double> edge(p1, p2);
+
+	point answer(0.0, 0.0);
+
+	EXPECT_EQ(edge.midpoint(), answer);
+}
+
+TEST(EdgeTests, slopeTest)
+{
+	using point = point<double>;
+	point p1(-20, 0.0);
+	point p2(0.0, 20.0);
+
+	edge<double> edge(p1, p2);
+
+	EXPECT_EQ(edge.slope(), 1.0);
+}
+
+TEST(EdgeTests, rotationTest)
+{
+	using point = point<double>;
+
+	point p1(1.0, 1.0);
+	point p2(3.0, 1.0);
+
+	edge<double> edge(p1, p2);
+	// rotate clockwise by using a negative angle.
+	auto rotated = rotate(edge, -90.0);
+
+	EXPECT_EQ(rotated.start(), p1);
+	EXPECT_DOUBLE_EQ(rotated.end().x(), 1.0);
+	EXPECT_DOUBLE_EQ(rotated.end().y(), -1.0);
+}
+
 TEST(TriangleTests, equalityTest)
 {
 	using point = point<double>;
@@ -70,4 +123,48 @@ TEST(TriangleTests, equalityTest)
 	triangle<double> tri2(p2, p1, p3);
 
 	EXPECT_TRUE(tri1 == tri2);
+}
+
+TEST(TriangleTests, circumcircleTest1)
+{
+	using point = point<double>;
+	using triangle = triangle<double>;
+
+	point p1(0.0, 2.0);
+	point p2(2.0, -2.0);
+	point p3(-2.0, -2.0);
+
+	point answer(0, -0.5);
+
+	triangle tri(p1, p2, p3);
+
+	auto cc = tri.circumcircle();
+	
+	std::cout << "Calculated circumcircle center: " << cc.first << std::endl;
+	std::cout << "Expected: " << answer << std::endl;
+
+	EXPECT_NEAR(cc.first[0], answer[0], 1e-6);
+	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
+}
+
+TEST(TriangleTests, circumcircleTest2)
+{
+	using point = point<double>;
+	using triangle = triangle<double>;
+
+	point p1(1.0, 3.0);
+	point p2(5.0, 4.0);
+	point p3(-1.0, 1.0);
+
+	point answer(4.5, -2.5);
+
+	triangle tri(p1, p2, p3);
+
+	auto cc = tri.circumcircle();
+
+	std::cout << "Calculated circumcircle center: " << cc.first << std::endl;
+	std::cout << "Expected: " << answer << std::endl;
+
+	EXPECT_NEAR(cc.first[0], answer[0], 1e-6);
+	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
 }

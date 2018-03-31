@@ -79,7 +79,7 @@ namespace delaunaypp {
 
 
 	template <typename T, std::size_t N>
-	point<T,N>::point(const T& x, const T& y, const T& z)
+	point<T, N>::point(const T& x, const T& y, const T& z)
 	{
 		static_assert(N >= 3, "X,Y,Z constructor only available in 3D+");
 		mData[0] = x;
@@ -395,7 +395,7 @@ namespace delaunaypp {
 		stream << "(";
 		for (auto i = 0; i < N; i++)
 		{
-			if (i < N-1) stream << point[i] << ", ";
+			if (i < N - 1) stream << point[i] << ", ";
 			else stream << point[i];
 		}
 		stream << ")";
