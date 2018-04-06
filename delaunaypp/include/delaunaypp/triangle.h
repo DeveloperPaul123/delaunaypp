@@ -134,11 +134,11 @@ namespace delaunaypp
 		auto circumradius = (length_a* length_b * length_c) / (4.0 * k);
 		_circumcircle.second = circumradius;
 
-		// OM refers to edge from circum center to midpoint on line AB, ie edge 1
+		// OM refers to edge from circumcenter to midpoint on line AB, ie edge 1
 		auto length_om = std::sqrt(std::abs((d*d) - (circumradius*circumradius)));
 
-		// rotate clockwise, note negative angle
-		auto rotated_ab = rotate(_e1, 90.0);
+		// rotate clockwise, note the negative angle
+		auto rotated_ab = rotate(_e1, -90.0);
 		auto rotated_length = rotated_ab.length();
 		auto scaling = length_om / rotated_length;
 
