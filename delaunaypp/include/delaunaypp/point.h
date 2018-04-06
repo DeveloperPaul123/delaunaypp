@@ -3,6 +3,8 @@
 #include <array>
 #include <functional>
 #include <exception>
+#include <algorithm>
+#include <math.h>
 
 namespace delaunaypp {
 #pragma region Point class declaration
@@ -41,8 +43,8 @@ namespace delaunaypp {
 		value_type operator[](const std::size_t& index) const;
 		reference operator=(const point_type& other);
 		reference operator=(point_type&& other) noexcept;
-		reference operator+(const point_type& other);
-		reference operator-(const point_type& other);
+		point_type operator+(const point_type& other);
+        point_type operator-(const point_type& other);
 		point_type operator+(const point_type& other) const;
 		point_type operator-(const point_type &other) const;
 	private:
@@ -90,7 +92,10 @@ namespace delaunaypp {
 	template <typename T, std::size_t N>
 	point<T, N>::point(std::initializer_list<T> data)
 	{
-		assert(data.size() == N, "Initializer list size must match size of point.");
+		if(data.size() != N)
+		{
+			throw std::runtime_error("Initializer list size must match size of point.");
+		}
 		std::copy(data.begin(), data.end(), mData.begin());
 	}
 
@@ -137,7 +142,7 @@ namespace delaunaypp {
 	{
 		if (index >= N)
 		{
-			throw std::exception("Index out of bounds.");
+			throw std::runtime_error("Index out of bounds.");
 		}
 		return mData[index];
 	}
@@ -147,7 +152,7 @@ namespace delaunaypp {
 	{
 		if (index >= N)
 		{
-			throw std::exception("Index out of bounds.");
+			throw std::runtime_error("Index out of bounds.");
 		}
 		return mData[index];
 	}
@@ -171,24 +176,23 @@ namespace delaunaypp {
 	}
 
 	template <typename T, std::size_t N>
-	typename point<T, N>::reference point<T, N>::operator+(const point_type& other)
+	typename point<T, N>::point_type point<T, N>::operator+(const point_type& other)
 	{
-		point_type return_point;
+		point_type return_point(*this);
 		for (auto i = 0; i < N; i++)
 		{
-			return_point[i] = mData[i] + other[i];
+			return_point[i] += other[i];
 		}
-
 		return return_point;
 	}
 
 	template <typename T, std::size_t N>
-	typename point<T, N>::reference point<T, N>::operator-(const point_type& other)
+	typename point<T, N>::point_type point<T, N>::operator-(const point_type& other)
 	{
-		point_type return_point;
+		point_type return_point(*this);
 		for (auto i = 0; i < N; i++)
 		{
-			return_point[i] = mData[i] - other[i];
+			return_point[i] += other[i];
 		}
 
 		return return_point;

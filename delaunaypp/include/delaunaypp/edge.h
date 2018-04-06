@@ -62,8 +62,8 @@ namespace delaunaypp
 	template <typename T>
 	edge<T>::edge(edge&& other) noexcept
 	{
-		_start(std::move(other->_start));
-		_end(std::move(other->_end));
+		_start = std::move(other.start());
+		_end = std::move(other.end());
 	}
 
 	template <typename T>
@@ -76,8 +76,8 @@ namespace delaunaypp
 	template <typename T>
 	void edge<T>::operator=(edge&& other) noexcept
 	{
-		_start(std::move(other->_start));
-		_end(std::move(other->_end));
+		_start = std::move(other.start());
+		_end = std::move(other.end());
 	}
 
 	template <typename T>

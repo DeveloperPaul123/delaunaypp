@@ -51,7 +51,7 @@ namespace delaunaypp
 				{
 					return point.y();
 				}
-				throw std::exception("Unsupported axis. Only x and y are supported.");
+				throw std::runtime_error("Unsupported axis. Only x and y are supported.");
 			}
 		private:
 			axis _axis;
