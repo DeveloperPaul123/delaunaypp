@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 2.8.8)
 
 include(cmake/Externals.cmake)
 
+find_package(Git REQUIRED)
+if(NOT Git_FOUND)
+    message(FATAL_ERROR "Git is required!")
+endif(NOT Git_FOUND)
+
 ExternalProject_Add(GoogleTestExternal
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG "718fd88d8f145c63b8cc134cf8fed92743cc112f"
@@ -22,6 +27,10 @@ set(GTEST_INCLUDE_DIRS ${source_dir}/googletest/include)
 # Specify MainTest's link libraries
 ExternalProject_Get_Property(GoogleTestExternal binary_dir)
 set(GTEST_LIBS_DIR ${binary_dir}/googlemock/gtest)
+
+# workaround for cmake bug where it complains that interface target
+# include non-existant path.
+file(MAKE_DIRECTORY ${GTEST_INCLUDE_DIRS})
 
 add_library(googletest UNKNOWN IMPORTED)
 add_library(googletest_main UNKNOWN IMPORTED)
