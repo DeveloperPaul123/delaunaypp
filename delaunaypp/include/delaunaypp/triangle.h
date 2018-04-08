@@ -24,9 +24,14 @@ namespace delaunaypp
 		bool circumcircleContains(const PointType& point);
 		Circumcircle circumcircle();
 
+		std::array<PointType, 3> points();
+		std::array<EdgeType, 3> edges();
+
+		EdgeType edge_at(const int & index);
+		PointType point_at(const int & index);
 	private:
-		PointType _p1, _p2, _p3;
-		EdgeType _e1, _e2, _e3;
+		std::array<PointType, 3> _points;
+		std::array<EdgeType, 3> _edges;
 		Circumcircle _circumcircle;
 
 		void calculateCircumcircle();
@@ -34,62 +39,51 @@ namespace delaunaypp
 
 	template <typename T>
 	triangle<T>::triangle(PointType p1, PointType p2, PointType p3) :
-		_p1(std::move(p1)), _p2(std::move(p2)), _p3(std::move(p3)), _e1(p1, p2), _e2(p2, p3), _e3(p3, p1), _circumcircle(std::make_pair(PointType(0.0,0.0), -1.0))
+		_points{ p1, p2, p3 }, _edges{ EdgeType{p1, p2}, EdgeType{p2, p3}, EdgeType{p3, p1} }, _circumcircle(std::make_pair(PointType(0.0, 0.0), -1.0))
 	{
 	}
 
 	template <typename T>
 	triangle<T>::triangle(triangle& other)
 	{
-		_p1 = other->_p1;
-		_p2 = other->_p2;
-		_p3 = other->_p3;
-		_e1 = other->_e1;
-		_e2 = other->_e2;
-		_e3 = other->_e3;
+		std::copy(_points.begin(), _points.end(), other.points().begin());
+		std::copy(_edges.begin(), _edges.end(), other.edges().begin());
+		_circumcircle = other._circumcircle;
 	}
 
 	template <typename T>
 	triangle<T>::triangle(triangle&& other) noexcept
 	{
-		_p1(std::move(other->_p1));
-		_p2(std::move(other->_p2));
-		_p3(std::move(other->_p3));
-
-		_e1(std::move(other->_e1));
-		_e2(std::move(other->_e2));
-		_e3(std::move(other->_e3));
+		_points = std::move(other._points);
+		_edges = std::move(other._edges);
+		_circumcircle = std::move(other._circumcircle);
 	}
 
 	template <typename T>
 	void triangle<T>::operator=(const triangle& other)
 	{
-		_p1 = other->_p1;
-		_p2 = other->_p2;
-		_p3 = other->_p3;
-		_e1 = other->_e1;
-		_e2 = other->_e2;
-		_e3 = other->_e3;
+		std::copy(_points.begin(), _points.end(), other._points.begin());
+		std::copy(_edges.begin(), _edges.end(), other._edges.begin());
+		_circumcircle = other._circumcircle;
 	}
 
 	template <typename T>
 	void triangle<T>::operator=(triangle&& other) noexcept
 	{
-		_p1(std::move(other->_p1));
-		_p2(std::move(other->_p2));
-		_p3(std::move(other->_p3));
-
-		_e1(std::move(other->_e1));
-		_e2(std::move(other->_e2));
-		_e3(std::move(other->_e3));
+		_points = std::move(other._points);
+		_edges = std::move(other._edges);
+		_circumcircle = std::move(other._circumcircle);
 	}
 
 	template <typename T>
 	bool triangle<T>::operator==(const triangle& other)
 	{
-		return (_p1 == other._p1 || _p1 == other._p2 || _p1 == other._p3) &&
-			(_p2 == other._p1 || _p2 == other._p2 || _p2 == other._p3) &&
-			(_p3 == other._p1 || _p3 == other._p2 || _p3 == other._p3);
+		auto p1 = _points[0];
+		auto p2 = _points[1];
+		auto p3 = _points[2];
+		return (p1 == other._points[0] || p1 == other._points[1] || p1 == other._points[2]) &&
+			(p2 == other._points[0] || p2 == other._points[1] || p2 == other._points[2]) &&
+			(p3 == other._points[0] || p3 == other._points[1] || p3 == other._points[2]);
 	}
 
 	template <typename T>
@@ -116,8 +110,41 @@ namespace delaunaypp
 	}
 
 	template <typename T>
+	std::array<typename triangle<T>::PointType, 3> triangle<T>::points()
+	{
+		return _points;
+	}
+
+	template <typename T>
+	std::array<typename triangle<T>::EdgeType, 3> triangle<T>::edges()
+	{
+		return _edges;
+	}
+
+	template <typename T>
+	typename triangle<T>::EdgeType triangle<T>::edge_at(const int& index)
+	{
+//		static_assert(index < 3 && index >= 0);
+		return _edges[index];
+	}
+
+	template <typename T>
+	typename triangle<T>::PointType triangle<T>::point_at(const int& index)
+	{
+//		static_assert(index < 3 && index >= 0, "Index must be between 0-2");
+		return _points[index];
+	}
+
+	template <typename T>
 	void triangle<T>::calculateCircumcircle()
 	{
+		auto _e1 = _edges[0];
+		auto _e2 = _edges[1];
+		auto _e3 = _edges[2];
+		auto _p1 = _points[0];
+		auto _p2 = _points[1];
+		auto _p3 = _points[2];
+
 		// based on this: https://www.quora.com/What-are-the-ways-find-circumcenter-of-a-triangle-given-3-points
 		auto midpoint_ab = _e1.midpoint();
 		auto length_a= _e1.length();

@@ -14,6 +14,7 @@ namespace delaunaypp
 		using PointType = point<T>;
 
 	public:
+		edge() = default;
 		edge(PointType start, PointType end);
 		edge(edge &other);
 		edge(edge &&other) noexcept;
@@ -21,7 +22,9 @@ namespace delaunaypp
 		void operator=(edge& other);
 		void operator=(edge&& other) noexcept;
 		bool operator==(edge& other);
-
+		bool operator==(edge& other) const;
+		bool operator<(edge& other);
+		bool operator<(const edge& other) const;
 		PointType start() const;
 		PointType end() const;
 		T length();
@@ -84,6 +87,24 @@ namespace delaunaypp
 	bool edge<T>::operator==(edge& other)
 	{
 		return _start == other.start() && _end == other.end();
+	}
+
+	template <typename T>
+	bool edge<T>::operator==(edge& other) const
+	{
+		return _start == other.start() && _end == other.end();
+	}
+
+	template <typename T>
+	bool edge<T>::operator<(edge& other)
+	{
+		return _start < other._start && _end < other._end;
+	}
+
+	template <typename T>
+	bool edge<T>::operator<(const edge& other) const
+	{
+		return _start < other._start && _end < other._end;
 	}
 
 	template <typename T>

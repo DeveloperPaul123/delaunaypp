@@ -4,6 +4,7 @@
 #include <delaunaypp/pointaccessor.h>
 #include "delaunaypp/edge.h"
 #include "delaunaypp/triangle.h"
+#include "delaunaypp/delaunay.h"
 
 using namespace delaunaypp;
 TEST(PointAccessorTests, testIndexAccessor)
@@ -168,3 +169,19 @@ TEST(TriangleTests, circumcircleTest2)
 	EXPECT_NEAR(cc.first[0], answer[0], 1e-6);
 	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
 }
+
+//TEST(DelaunayTests, simpleSquareTests)
+//{
+//	using point = point<double>;
+//	using triangle = triangle<double>;
+//
+//	const point p1(-2.0, 2.0);
+//	const point p2(2.0, 2.0);
+//	const point p3(2.0, -2.0);
+//	const point p4(-2.0, -2.0);
+//
+//	delaunay<point> del({ p1, p2, p3, p4 });
+//	auto triangles = del.triangulate();
+//
+//	ASSERT_EQ(triangles.size(), 2);
+//}
