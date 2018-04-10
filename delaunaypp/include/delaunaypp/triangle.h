@@ -14,7 +14,7 @@ namespace delaunaypp
 		using Circumcircle = std::pair<point<double>, double>;
 
 		triangle(PointType p1, PointType p2, PointType p3);
-		triangle(triangle &other);
+		triangle(const triangle &other);
 		triangle(triangle &&other) noexcept;
 
 		void operator=(const triangle &other);
@@ -44,10 +44,10 @@ namespace delaunaypp
 	}
 
 	template <typename T>
-	triangle<T>::triangle(triangle& other)
+	triangle<T>::triangle(const triangle& other)
 	{
-		std::copy(_points.begin(), _points.end(), other.points().begin());
-		std::copy(_edges.begin(), _edges.end(), other.edges().begin());
+		_points = other._points;
+		_edges = other._edges;
 		_circumcircle = other._circumcircle;
 	}
 
@@ -62,8 +62,8 @@ namespace delaunaypp
 	template <typename T>
 	void triangle<T>::operator=(const triangle& other)
 	{
-		std::copy(_points.begin(), _points.end(), other._points.begin());
-		std::copy(_edges.begin(), _edges.end(), other._edges.begin());
+		_points = other._points;
+		_edges = other._edges;
 		_circumcircle = other._circumcircle;
 	}
 

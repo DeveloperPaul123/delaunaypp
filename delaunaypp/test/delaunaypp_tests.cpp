@@ -49,6 +49,8 @@ TEST(EdgeTests, equalityTest)
 	edge edge1(p1, p2);
 	edge edge2(p2, p3);
 	edge edge3(p3, p1);
+	edge edge4(p1, p3);
+	edge edge5(p3, p2);
 
 	EXPECT_FALSE(edge1 == edge2);
 	EXPECT_FALSE(edge1 == edge3);
@@ -57,6 +59,8 @@ TEST(EdgeTests, equalityTest)
 	EXPECT_TRUE(edge1 == edge1);
 	EXPECT_TRUE(edge2 == edge2);
 	EXPECT_TRUE(edge3 == edge3);
+	EXPECT_TRUE(edge2 == edge5);
+	EXPECT_TRUE(edge4 == edge3);
 }
 
 TEST(EdgeTests, midpointTest1)
@@ -126,6 +130,35 @@ TEST(TriangleTests, equalityTest)
 	EXPECT_TRUE(tri1 == tri2);
 }
 
+TEST(TriangleTests, equalityTest2)
+{
+	using point = point<double>;
+	using triangle = triangle<double>;
+
+	point p1(4.0, 5.0);
+	point p2(5.6, 5.0);
+	point p3(1.0, -8.0);
+
+	triangle tri1(p1, p2, p3);
+	triangle tri2(p2, p1, p3);
+	triangle tri3(p2, p1, p3);
+	triangle tri4(p3, p2, p1);
+	triangle tri5(p3, p1, p2);
+
+	std::vector<triangle> tris = { tri1, tri2, tri3, tri4, tri5 };
+
+	for(auto i = 0; i < tris.size(); i++)
+	{
+		for(auto j = 0; j < tris.size(); j++)
+		{
+			if(i == j)
+				continue;;
+
+			EXPECT_TRUE(tris[i] == tris[j]);
+		}
+	}
+}
+
 TEST(TriangleTests, circumcircleTest1)
 {
 	using point = point<double>;
@@ -170,18 +203,42 @@ TEST(TriangleTests, circumcircleTest2)
 	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
 }
 
-//TEST(DelaunayTests, simpleSquareTests)
-//{
-//	using point = point<double>;
-//	using triangle = triangle<double>;
-//
-//	const point p1(-2.0, 2.0);
-//	const point p2(2.0, 2.0);
-//	const point p3(2.0, -2.0);
-//	const point p4(-2.0, -2.0);
-//
-//	delaunay<point> del({ p1, p2, p3, p4 });
-//	auto triangles = del.triangulate();
-//
-//	ASSERT_EQ(triangles.size(), 2);
-//}
+TEST(DelaunayTests, triangleTest)
+{
+	using point = point<double>;
+	using triangle = triangle<double>;
+
+	const point p1(0.0);
+	const point p2(1.0, 1.0);
+	const point p3(1.0, 0.0);
+
+	delaunaypp::delaunay<point> del({ p1, p2, p3 });
+	auto triangles = del.triangulate();
+	ASSERT_EQ(triangles.size(), 3);
+}
+
+TEST(DelaunayTests, simpleSquareTests)
+{
+	using point = point<double>;
+	using triangle = triangle<double>;
+
+	const point p1(-2.0, 2.0);
+	const point p2(2.0, 2.0);
+	const point p3(2.0, -2.0);
+	const point p4(-2.0, -2.0);
+
+	delaunay<point> del({ p1, p2, p3, p4 });
+	auto triangles = del.triangulate();
+
+	for(auto &tri: triangles)
+	{
+		auto points = tri.points();
+		for(auto &p: points)
+		{
+			std::cout << p << " ";
+		}
+		std::cout << std::endl;
+
+	}
+	ASSERT_EQ(triangles.size(), 2);
+}

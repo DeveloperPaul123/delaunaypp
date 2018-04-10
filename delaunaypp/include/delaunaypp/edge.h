@@ -16,10 +16,10 @@ namespace delaunaypp
 	public:
 		edge() = default;
 		edge(PointType start, PointType end);
-		edge(edge &other);
+		edge(const edge &other);
 		edge(edge &&other) noexcept;
 		~edge() = default;
-		void operator=(edge& other);
+		void operator=(const edge& other);
 		void operator=(edge&& other) noexcept;
 		bool operator==(edge& other);
 		bool operator==(edge& other) const;
@@ -56,7 +56,7 @@ namespace delaunaypp
 	}
 
 	template <typename T>
-	edge<T>::edge(edge& other)
+	edge<T>::edge(const edge& other)
 	{
 		_start = other.start();
 		_end = other.end();
@@ -70,7 +70,7 @@ namespace delaunaypp
 	}
 
 	template <typename T>
-	void edge<T>::operator=(edge& other)
+	void edge<T>::operator=(const edge& other)
 	{
 		_start = other.start();
 		_end = other.end();
@@ -86,13 +86,15 @@ namespace delaunaypp
 	template <typename T>
 	bool edge<T>::operator==(edge& other)
 	{
-		return _start == other.start() && _end == other.end();
+		return (_start == other.start() && _end == other.end()) ||
+			(_start == other.end() && _end == other.start());
 	}
 
 	template <typename T>
 	bool edge<T>::operator==(edge& other) const
 	{
-		return _start == other.start() && _end == other.end();
+		return (_start == other.start() && _end == other.end()) || 
+			(_start == other.end() && _end == other.start());
 	}
 
 	template <typename T>
