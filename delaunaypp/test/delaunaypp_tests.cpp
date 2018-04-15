@@ -40,7 +40,7 @@ TEST(PointAccessorTests, testGetterAccessor)
 TEST(EdgeTests, equalityTest)
 {
 	using point = point<double>;
-	using edge = internal::edge<double>;
+	using edge = internal::edge<point>;
 
 	point p1(4.0, 5.0);
 	point p2(5.6, 5.0);
@@ -52,6 +52,11 @@ TEST(EdgeTests, equalityTest)
 	edge edge4(p1, p3);
 	edge edge5(p3, p2);
 
+	std::vector<edge> edges{ edge1, edge2, edge3 };
+	auto edge_it = edges.begin();
+	auto edge_it2 = edge_it + 1;
+
+	EXPECT_FALSE(*edge_it == *edge_it2);
 	EXPECT_FALSE(edge1 == edge2);
 	EXPECT_FALSE(edge1 == edge3);
 	EXPECT_FALSE(edge2 == edge3);
@@ -66,7 +71,7 @@ TEST(EdgeTests, equalityTest)
 TEST(EdgeTests, midpointTest1)
 {
 	using point = point<double>;
-	using edge = internal::edge<double>;
+	using edge = internal::edge<point>;
 	point p1(0.0, -1.0);
 	point p2(0.0, 1.0);
 	
@@ -79,8 +84,9 @@ TEST(EdgeTests, midpointTest1)
 
 TEST(EdgeTests, midpointTest2)
 {
-	using edge = internal::edge<double>;
 	using point = point<double>;
+	using edge = internal::edge<point>;
+
 	point p1(-20, 0.0);
 	point p2(20.0, 0.0);
 
@@ -94,7 +100,7 @@ TEST(EdgeTests, midpointTest2)
 TEST(EdgeTests, slopeTest)
 {
 	using point = point<double>;
-	using edge = internal::edge<double>;
+	using edge = internal::edge<point>;
 
 	point p1(-20, 0.0);
 	point p2(0.0, 20.0);
@@ -107,7 +113,7 @@ TEST(EdgeTests, slopeTest)
 TEST(EdgeTests, rotationTest)
 {
 	using point = point<double>;
-	using edge = internal::edge<double>;
+	using edge = internal::edge<point>;
 
 	point p1(1.0, 1.0);
 	point p2(3.0, 1.0);
@@ -256,18 +262,14 @@ TEST(DelaunayTests, triangleTest)
 	using point = point<double>;
 	using triangle = triangle<double>;
 
-	const point p1(0.0, 0.0);
-	const point p2(1.0, 1.0);
-	const point p3(1.0, 0.0);
-	std::vector<point> data(3);
-
-	data[0] = p1;
-	data[1] = p2;
-	data[2] = p3;
+	const point p1(5.0, 0.0);
+	const point p2(-4.0, 0.0);
+	const point p3(0.0, 3.0);
+	std::vector<point> data{ p1, p2, p3 };
 
 	delaunaypp::delaunay<point> del(data);
 	auto triangles = del.triangulate();
-	ASSERT_EQ(triangles.size(), 3);
+	ASSERT_EQ(triangles.size(), 1);
 }
 
 TEST(DelaunayTests, simpleSquareTests)

@@ -5,6 +5,7 @@
 #include <exception>
 #include <algorithm>
 #include <math.h>
+#include <iomanip>
 
 namespace delaunaypp {
 #pragma region Point class declaration
@@ -396,7 +397,7 @@ namespace delaunaypp {
 	template<std::size_t N, typename T>
 	std::ostream& operator<<(std::ostream& stream, const point<T, N> &point)
 	{
-		stream << "(";
+		stream << std::setprecision(3) << "(";
 		for (auto i = 0; i < N; i++)
 		{
 			if (i < N - 1) stream << point[i] << ", ";
@@ -407,3 +408,4 @@ namespace delaunaypp {
 	}
 #pragma endregion
 }
+

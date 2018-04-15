@@ -2,6 +2,8 @@
 #include "point.h"
 #include "edge.h"
 
+#include <assert.h>
+
 namespace delaunaypp
 {
 	template<typename T>
@@ -10,7 +12,7 @@ namespace delaunaypp
 	public:
 		
 		using PointType = point<T>;
-		using EdgeType = internal::edge<T>;
+		using EdgeType = internal::edge<PointType>;
 		using Circumcircle = std::pair<point<double>, double>;
 
 		triangle(PointType p1, PointType p2, PointType p3);
@@ -24,11 +26,14 @@ namespace delaunaypp
 		bool circumcircleContains(const PointType& point);
 		Circumcircle circumcircle();
 
-		std::array<PointType, 3> points();
-		std::array<EdgeType, 3> edges();
+		std::array<PointType, 3> points() const;
+		std::array<EdgeType, 3> edges() const;
 
 		EdgeType edge_at(const int & index);
 		PointType point_at(const int & index);
+
+		bool is_bad() const;
+		void set_is_bad(bool is_bad);
 	private:
 		std::array<PointType, 3> points_;
 		std::array<EdgeType, 3> edges_;
@@ -50,6 +55,7 @@ namespace delaunaypp
 		points_ = other.points_;
 		edges_ = other.edges_;
 		circumcircle_ = other.circumcircle_;
+		is_bad_ = other.is_bad_;
 	}
 
 	template <typename T>
@@ -87,13 +93,13 @@ namespace delaunaypp
 	}
 
 	template <typename T>
-	std::array<typename triangle<T>::PointType, 3> triangle<T>::points()
+	std::array<typename triangle<T>::PointType, 3> triangle<T>::points() const
 	{
 		return points_;
 	}
 
 	template <typename T>
-	std::array<typename triangle<T>::EdgeType, 3> triangle<T>::edges()
+	std::array<typename triangle<T>::EdgeType, 3> triangle<T>::edges() const 
 	{
 		return edges_;
 	}
@@ -113,6 +119,19 @@ namespace delaunaypp
 		assert(index < 3);
 		return points_[index];
 	}
+
+	template <typename T>
+	bool triangle<T>::is_bad() const
+	{
+		return is_bad_;
+	}
+
+	template <typename T>
+	void triangle<T>::set_is_bad(bool is_bad)
+	{
+		is_bad_ = is_bad;
+	}
+
 
 	template <typename T>
 	void triangle<T>::calculateCircumcircle()
@@ -140,7 +159,7 @@ namespace delaunaypp
 		auto circumradius = (length_a* length_b * length_c) / (4.0 * k);
 		circumcircle_.second = circumradius;
 
-		// OM refers to edge from circumcenter to midpoint on line AB, ie edge 1
+		// OM refers to EdgeType from circumcenter to midpoint on line AB, ie EdgeType 1
 		auto length_om = std::sqrt(std::abs((d*d) - (circumradius*circumradius)));
 
 		// rotate clockwise, note the negative angle
@@ -149,7 +168,7 @@ namespace delaunaypp
 		auto scaling = length_om / rotated_length;
 
 		// scale using complex
-		// MO is vector from midpoint of AB (edge 1) to O the circumcenter
+		// MO is vector from midpoint of AB (EdgeType 1) to O the circumcenter
 		std::complex<double> mo(rotated_ab.end().x() - rotated_ab.start().x(), 
 			rotated_ab.end().y() - rotated_ab.start().y());
 		mo *= scaling;
@@ -172,5 +191,19 @@ namespace delaunaypp
 			circumcircle_.first = midpoint_ab - mo_p;
 		}
 	}
+
+	template <typename T>
+	inline std::ostream& operator<<(std::ostream& stream, const triangle<T>& tri)
+	{
+		stream << "[";
+		for(auto point : tri.points())
+		{
+			stream << point << " ";
+		}
+		stream << "]";
+
+		return stream;
+	}
+
 }
 
