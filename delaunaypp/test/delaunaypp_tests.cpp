@@ -40,7 +40,7 @@ TEST(PointAccessorTests, testGetterAccessor)
 TEST(EdgeTests, equalityTest)
 {
 	using point = point<double>;
-	using edge = edge<double>;
+	using edge = internal::edge<double>;
 
 	point p1(4.0, 5.0);
 	point p2(5.6, 5.0);
@@ -66,54 +66,73 @@ TEST(EdgeTests, equalityTest)
 TEST(EdgeTests, midpointTest1)
 {
 	using point = point<double>;
+	using edge = internal::edge<double>;
 	point p1(0.0, -1.0);
 	point p2(0.0, 1.0);
 	
-	edge<double> edge(p1, p2);
+	edge e(p1, p2);
 
 	point answer(0.0, 0.0);
 
-	EXPECT_EQ(edge.midpoint(), answer);
+	EXPECT_EQ(e.midpoint(), answer);
 }
 
 TEST(EdgeTests, midpointTest2)
 {
+	using edge = internal::edge<double>;
 	using point = point<double>;
 	point p1(-20, 0.0);
 	point p2(20.0, 0.0);
 
-	edge<double> edge(p1, p2);
+	edge e(p1, p2);
 
 	point answer(0.0, 0.0);
 
-	EXPECT_EQ(edge.midpoint(), answer);
+	EXPECT_EQ(e.midpoint(), answer);
 }
 
 TEST(EdgeTests, slopeTest)
 {
 	using point = point<double>;
+	using edge = internal::edge<double>;
+
 	point p1(-20, 0.0);
 	point p2(0.0, 20.0);
 
-	edge<double> edge(p1, p2);
+	edge e(p1, p2);
 
-	EXPECT_EQ(edge.slope(), 1.0);
+	EXPECT_EQ(e.slope(), 1.0);
 }
 
 TEST(EdgeTests, rotationTest)
 {
 	using point = point<double>;
+	using edge = internal::edge<double>;
 
 	point p1(1.0, 1.0);
 	point p2(3.0, 1.0);
 
-	edge<double> edge(p1, p2);
+	edge e(p1, p2);
 	// rotate clockwise by using a negative angle.
-	auto rotated = rotate(edge, -90.0);
+	auto rotated = internal::rotate(e, -90.0);
 
 	EXPECT_EQ(rotated.start(), p1);
 	EXPECT_DOUBLE_EQ(rotated.end().x(), 1.0);
 	EXPECT_DOUBLE_EQ(rotated.end().y(), -1.0);
+}
+
+TEST(PointTests, equalityTest)
+{
+	using point = point<double>;
+
+	point p1(1.0, 2.0);
+	point p2(1.0, 3.0);
+	point p3(3.0, 1.0);
+
+	EXPECT_FALSE(p1 == p2);
+	EXPECT_TRUE(p1 == p1);
+	EXPECT_FALSE(p1 == p3);
+	EXPECT_FALSE(p2 == p3);
 }
 
 TEST(TriangleTests, equalityTest)
@@ -179,6 +198,8 @@ TEST(TriangleTests, circumcircleTest1)
 
 	EXPECT_NEAR(cc.first[0], answer[0], 1e-6);
 	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
+
+	EXPECT_FALSE(tri.circumcircleContains({ -3.0, 3.0 }));
 }
 
 TEST(TriangleTests, circumcircleTest2)
@@ -203,16 +224,48 @@ TEST(TriangleTests, circumcircleTest2)
 	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
 }
 
+TEST(TriangleTests, circumcircleTest3)
+{
+	using point = point<double>;
+	using triangle = triangle<double>;
+
+	point p1(52.3, -96.5);
+	point p2(45.6, 65.5);
+	point p3(1.0, -10.3);
+
+	point answer(93.42455211779, -13.6606203);
+
+	triangle tri(p1, p2, p3);
+
+	auto cc = tri.circumcircle();
+
+	EXPECT_NEAR(cc.first[0], answer[0], 1e-5);
+	EXPECT_NEAR(cc.first[1], answer[1], 1e-5);
+
+	EXPECT_TRUE(tri.circumcircleContains(answer));
+}
+
+template<typename Container, typename T = typename Container::value_type>
+void print_data(const Container &data)
+{
+	std::copy(data.begin(), data.end(), std::ostream_iterator<T>(std::cout, " "));
+}
+
 TEST(DelaunayTests, triangleTest)
 {
 	using point = point<double>;
 	using triangle = triangle<double>;
 
-	const point p1(0.0);
+	const point p1(0.0, 0.0);
 	const point p2(1.0, 1.0);
 	const point p3(1.0, 0.0);
+	std::vector<point> data(3);
 
-	delaunaypp::delaunay<point> del({ p1, p2, p3 });
+	data[0] = p1;
+	data[1] = p2;
+	data[2] = p3;
+
+	delaunaypp::delaunay<point> del(data);
 	auto triangles = del.triangulate();
 	ASSERT_EQ(triangles.size(), 3);
 }
@@ -230,15 +283,11 @@ TEST(DelaunayTests, simpleSquareTests)
 	delaunay<point> del({ p1, p2, p3, p4 });
 	auto triangles = del.triangulate();
 
+	std::cout << "Triangles: " << std::endl;
 	for(auto &tri: triangles)
 	{
-		auto points = tri.points();
-		for(auto &p: points)
-		{
-			std::cout << p << " ";
-		}
+		print_data(tri.points());
 		std::cout << std::endl;
-
 	}
 	ASSERT_EQ(triangles.size(), 2);
 }

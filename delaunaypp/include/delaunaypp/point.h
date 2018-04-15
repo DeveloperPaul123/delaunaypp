@@ -48,7 +48,7 @@ namespace delaunaypp {
 		point_type operator+(const point_type& other) const;
 		point_type operator-(const point_type &other) const;
 	private:
-		std::array<T, N> mData;
+		std::array<T, N> point_data_;
 	};
 #pragma endregion 
 
@@ -56,27 +56,27 @@ namespace delaunaypp {
 	template <typename T, std::size_t N>
 	point<T, N>::point()
 	{
-		std::fill(mData.begin(), mData.end(), T());
+		std::fill(point_data_.begin(), point_data_.end(), T());
 	}
 
 	template <typename T, std::size_t N>
 	point<T, N>::point(std::array<T, N> data) :
-		mData(std::move(data))
+		point_data_(std::move(data))
 	{
 	}
 
 	template <typename T, std::size_t N>
 	point<T, N>::point(const T& x)
 	{
-		mData[0] = x;
+		point_data_[0] = x;
 	}
 
 	template <typename T, std::size_t N>
 	point<T, N>::point(const T& x, const T& y)
 	{
 		static_assert(N >= 2, "X,Y constructor only available in 2D+");
-		mData[0] = x;
-		mData[1] = y;
+		point_data_[0] = x;
+		point_data_[1] = y;
 	}
 
 
@@ -84,9 +84,9 @@ namespace delaunaypp {
 	point<T, N>::point(const T& x, const T& y, const T& z)
 	{
 		static_assert(N >= 3, "X,Y,Z constructor only available in 3D+");
-		mData[0] = x;
-		mData[1] = y;
-		mData[2] = z;
+		point_data_[0] = x;
+		point_data_[1] = y;
+		point_data_[2] = z;
 	}
 
 	template <typename T, std::size_t N>
@@ -96,39 +96,39 @@ namespace delaunaypp {
 		{
 			throw std::runtime_error("Initializer list size must match size of point.");
 		}
-		std::copy(data.begin(), data.end(), mData.begin());
+		std::copy(data.begin(), data.end(), point_data_.begin());
 	}
 
 	template <typename T, std::size_t N>
 	point<T, N>::point(const point_type& other)
 	{
-		mData = other.mData;
+		point_data_ = other.point_data_;
 	}
 
 	template <typename T, std::size_t N>
 	point<T, N>::point(point_type&& other) noexcept :
-		mData(std::move(other.mData))
+		point_data_(std::move(other.point_data_))
 	{
 	}
 
 	template <typename T, std::size_t N>
 	T point<T, N>::x() const
 	{
-		return mData[0];
+		return point_data_[0];
 	}
 
 	template <typename T, std::size_t N>
 	template <class S>
 	typename std::enable_if<N >= 2, S>::type point<T, N>::y() const
 	{
-		return mData[1];
+		return point_data_[1];
 	}
 
 	template <typename T, std::size_t N>
 	template <class S>
 	typename std::enable_if<N >= 3, S>::type point<T, N>::z() const
 	{
-		return mData[2];
+		return point_data_[2];
 	}
 
 	template <typename T, std::size_t N>
@@ -144,7 +144,7 @@ namespace delaunaypp {
 		{
 			throw std::runtime_error("Index out of bounds.");
 		}
-		return mData[index];
+		return point_data_[index];
 	}
 
 	template <typename T, std::size_t N>
@@ -154,13 +154,13 @@ namespace delaunaypp {
 		{
 			throw std::runtime_error("Index out of bounds.");
 		}
-		return mData[index];
+		return point_data_[index];
 	}
 
 	template <typename T, std::size_t N>
 	point<T, N>& point<T, N>::operator=(const point_type& other)
 	{
-		mData = other.mData;
+		point_data_ = other.point_data_;
 		return *this;
 	}
 
@@ -171,7 +171,7 @@ namespace delaunaypp {
 		{
 			return *this;
 		}
-		mData = std::move(other.mData);
+		point_data_ = std::move(other.point_data_);
 		return *this;
 	}
 
@@ -204,7 +204,7 @@ namespace delaunaypp {
 		point_type return_point;
 		for (auto i = 0; i < N; i++)
 		{
-			return_point[i] = mData[i] + other[i];
+			return_point[i] = point_data_[i] + other[i];
 		}
 
 		return return_point;
@@ -216,7 +216,7 @@ namespace delaunaypp {
 		point_type return_point;
 		for (auto i = 0; i < N; i++)
 		{
-			return_point[i] = mData[i] - other[i];
+			return_point[i] = point_data_[i] - other[i];
 		}
 
 		return return_point;

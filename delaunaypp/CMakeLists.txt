@@ -34,5 +34,7 @@ if(BUILD_UNIT_TESTS)
         delaunaypp
         googletest 
         googletest_main)
+    add_dependencies(${project_test_name} googletest googletest_main)
+    
     add_test(${project_test_name} ${project_test_name})
 endif(BUILD_UNIT_TESTS)

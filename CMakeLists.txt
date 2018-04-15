@@ -4,6 +4,9 @@ project(delaunay)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 option(BUILD_UNIT_TESTS "Turn on to build unit tests for delaunaypp" OFF)
 
 if(BUILD_UNIT_TESTS)
