@@ -19,7 +19,6 @@ namespace delaunaypp
 			edge(const edge &other);
 			~edge() = default;
 
-			bool operator<(edge& other);
 			bool operator<(const edge& other) const;
 			PointType start() const;
 			PointType end() const;
@@ -63,15 +62,10 @@ namespace delaunaypp
 		}
 
 		template <typename PointType, typename T>
-		bool edge<PointType, T>::operator<(edge& other)
-		{
-			return std::tie(start_, end_) < std::tie(other.start(), other.end());
-		}
-
-		template <typename PointType, typename T>
 		bool edge<PointType, T>::operator<(const edge& other) const
 		{
-			return std::tie(start_, end_) < std::tie(other.start(), other.end());
+			return (start() == other.start() ? end() < other.end() : start() < other.start()) &&
+				!(*this == other);
 		}
 
 		template <typename PointType, typename T>
@@ -93,7 +87,7 @@ namespace delaunaypp
 		}
 
 		template <typename PointType, typename T>
-		typename PointType edge<PointType, T >::midpoint()
+		PointType edge<PointType, T >::midpoint()
 		{
 			return { (start_.x() + end_.x()) / 2.0, (start_.y() + end_.y()) / 2.0 };
 		}

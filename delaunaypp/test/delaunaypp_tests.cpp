@@ -205,7 +205,7 @@ TEST(TriangleTests, circumcircleTest1)
 	EXPECT_NEAR(cc.first[0], answer[0], 1e-6);
 	EXPECT_NEAR(cc.first[1], answer[1], 1e-6);
 
-	EXPECT_FALSE(tri.circumcircleContains({ -3.0, 3.0 }));
+	EXPECT_FALSE(tri.circumcircle_contains({ -3.0, 3.0 }));
 }
 
 TEST(TriangleTests, circumcircleTest2)
@@ -245,10 +245,13 @@ TEST(TriangleTests, circumcircleTest3)
 
 	auto cc = tri.circumcircle();
 
+	std::cout << "Calculated circumcircle center: " << cc.first << std::endl;
+	std::cout << "Expected: " << answer << std::endl;
+
 	EXPECT_NEAR(cc.first[0], answer[0], 1e-5);
 	EXPECT_NEAR(cc.first[1], answer[1], 1e-5);
 
-	EXPECT_TRUE(tri.circumcircleContains(answer));
+	EXPECT_TRUE(tri.circumcircle_contains(answer));
 }
 
 template<typename Container, typename T = typename Container::value_type>

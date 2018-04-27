@@ -21,9 +21,8 @@ namespace delaunaypp
 		triangle(triangle&& other) = default;
 
 		void operator=(const triangle &other);
-
 		bool operator==(const triangle &other);
-		bool circumcircleContains(const PointType& point);
+		bool circumcircle_contains(const PointType& point);
 		Circumcircle circumcircle();
 
 		std::array<PointType, 3> points() const;
@@ -70,7 +69,7 @@ namespace delaunaypp
 	}
 
 	template <typename T>
-	bool triangle<T>::circumcircleContains(const PointType& point)
+	bool triangle<T>::circumcircle_contains(const PointType& point)
 	{
 		if(circumcircle_.second < 0.0)
 		{
@@ -109,7 +108,7 @@ namespace delaunaypp
 	{
 		assert(index >= 0);
 		assert(index < 3);
-		return edges_[index];
+		return edges_.at(index);
 	}
 
 	template <typename T>
@@ -117,7 +116,7 @@ namespace delaunaypp
 	{
 		assert(index >= 0);
 		assert(index < 3);
-		return points_[index];
+		return points_.at(index);
 	}
 
 	template <typename T>
@@ -136,12 +135,12 @@ namespace delaunaypp
 	template <typename T>
 	void triangle<T>::calculateCircumcircle()
 	{
-		auto _e1 = edges_[0];
-		auto _e2 = edges_[1];
-		auto _e3 = edges_[2];
-		auto _p1 = points_[0];
-		auto _p2 = points_[1];
-		auto _p3 = points_[2];
+		auto _e1 = edge_at(0);
+		auto _e2 = edge_at(1);
+		auto _e3 = edge_at(2);
+		auto _p1 = point_at(0);
+		auto _p2 = point_at(1);
+		auto _p3 = point_at(2);
 
 		// based on this: https://www.quora.com/What-are-the-ways-find-circumcenter-of-a-triangle-given-3-points
 		auto midpoint_ab = _e1.midpoint();

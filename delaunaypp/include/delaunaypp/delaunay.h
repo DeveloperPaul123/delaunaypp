@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include <unordered_map>
 #include <iostream>
 
 #include "triangle.h"
@@ -41,18 +40,20 @@ namespace delaunaypp
 	template <typename PointType, typename T>
 	std::vector<typename delaunay<PointType, T>::TriangleType> delaunay<PointType, T>::triangulate()
 	{
+		// initialize the triangle list.
 		std::vector<TriangleType> triangles{};
-		if(points_.size() == 0)
+
+		// check if input points are empty or
+		// if there aren't enough to make any triangles.
+		if(points_.size() < 3)
 		{
 			return triangles;
 		}
 
-		// sort triangles by x and then y
-		std::stable_sort(points_.begin(), points_.end());
-
+		// determine the super triangle.
 		auto length = points_.size();
-		auto min_point = points_[0];
-		auto max_point = points_[length -1];
+		auto min_point = *std::min_element(points_.begin(), points_.end());
+		auto max_point = *std::max_element(points_.begin(), points_.end());
 		auto min_x = min_point.x();
 		auto min_y = min_point.y();
 		auto max_x = max_point.x();
@@ -61,25 +62,27 @@ namespace delaunaypp
 		auto dx = max_x - min_x;
 		auto dy = max_y - min_y;
 		auto dmax = std::max(dx, dy);
-		T denom(2.0);
-		auto mid_x = dx / denom;
-		auto mid_y = dy / denom;
+		
+		auto mid_x = min_x + dx * 0.5;
+		auto mid_y = min_y + dy * 0.5;
+
 		T delta(20.0);
 
+		// create super triangle points
 		PointType st_p1 = { mid_x - delta * dmax, mid_y - dmax };
 		PointType st_p2 = { mid_x, mid_y + delta * dmax };
 		PointType st_p3 = { mid_x + delta * dmax, mid_y - dmax };
 
 		// add super trianlge points to the point list.
-		points_.emplace_back(st_p1);
-		points_.emplace_back(st_p2);
-		points_.emplace_back(st_p3);
+		points_.push_back(st_p1);
+		points_.push_back(st_p2);
+		points_.push_back(st_p3);
 
 		// add super triangle to the triangle list
-		triangles.emplace_back(TriangleType{ st_p1, st_p2, st_p3 });
+		triangles.push_back(TriangleType(st_p1, st_p2, st_p3));
 
 		// loop through all the points
-		for(const auto &point: points_)
+		for(auto point = std::begin(points_); point != std::end(points_); ++point)
 		{
 			// initialize EdgeType list
 			std::vector<EdgeType> edges;
@@ -87,16 +90,23 @@ namespace delaunaypp
 			for(auto &triangle: triangles)
 			{
 				// check if the triangle circumcircle contains the point
-				auto contains = triangle.circumcircleContains(point);
+				auto contains = triangle.circumcircle_contains(*point);
 				if(contains)
 				{
 					// point is in the triangle circumcenter
 					// mark the triangle as bad and add it's edges to the edge buffer.
-					edges.push_back(triangle.edge_at(0));
-					edges.push_back(triangle.edge_at(1));
-					edges.push_back(triangle.edge_at(2));
+					auto e1 = triangle.edge_at(0);
+					auto e2 = triangle.edge_at(1);
+					auto e3 = triangle.edge_at(2);
+					edges.push_back(e1);
+					edges.push_back(e2);
+					edges.push_back(e3);
 					std::cout << "Triangle: " << triangle << " is bad" << std::endl;
 					triangle.set_is_bad(true);
+				}
+				else
+				{
+					triangle.set_is_bad(false);
 				}
 			}
 
@@ -127,49 +137,46 @@ namespace delaunaypp
 			{
 				for(auto edge2 = std::begin(edges); edge2 != std::end(edges); ++edge2)
 				{
-					if (edge1 == edge2) continue;
+					// don't compare an edge to itself
+					if (edge1 == edge2)
+					{
+						continue;
+					}
 
 					if(*edge1 == *edge2)
 					{
-						std::cout << "Edge: " << *edge1 << " is bad" << std::endl;
-						std::cout << "Edge: " << *edge2 << " is bad" << std::endl;
 						// mark edges as bad
 						edge1->set_is_bad(true);
 						edge2->set_is_bad(true);
+						std::cout << "Edge: " << *edge1 << " is bad " << edge1->is_bad() << std::endl;
+						std::cout << "Edge: " << *edge2 << " is bad " << edge2->is_bad() << std::endl;
 					}
 				}
 			}
 
 			// bad EdgeType test lambda
-			auto bad_edge_test = [](const auto &edge) -> bool
+			auto bad_edge_test = [](auto &edge) -> bool
 			{
 				return edge.is_bad();
 			};
 
-			std::cout << "Edges before: " << std::endl;
-			internal::print_data(edges);
-			std::cout << std::endl;
-
+			// get bad edges
 			auto bad_edge_iterator = std::remove_if(std::begin(edges), 
 				std::end(edges), 
 				bad_edge_test);
 
-			// we can safely erase
+			// we can safely erase the bad edges.
 			edges.erase(bad_edge_iterator, std::end(edges));
-
-			std::cout << "Edges after: " << std::endl;
-			internal::print_data(edges);
-			std::cout << std::endl;
 
 			// add to the triangle list all triangles formed between the point and the polygon edges. 
 			for(const auto & edge: edges)
 			{
-				triangles.emplace_back(TriangleType{ edge.start(), edge.end(), point });
+				triangles.push_back(TriangleType(*point, edge.start(), edge.end()));
 			}
 		} // end for loop through all points
 
 		// test for if a trianle uses the super triangle vertices. 
-		auto uses_super_triangle_test = [st_p1, st_p2, st_p3](TriangleType &triangle) -> bool
+		auto uses_super_triangle_test = [&st_p1, &st_p2, &st_p3](TriangleType &triangle) -> bool
 		{
 			auto points = triangle.points();
 			for(const auto& point: points)
