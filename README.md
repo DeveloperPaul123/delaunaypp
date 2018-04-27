@@ -6,6 +6,8 @@ A simple, easy to use implementation of Delaunay triangulation in 2D, written in
 
 This code based on [Paul Bourke's](http://paulbourke.net/papers/) [implmentation](http://paulbourke.net/papers/triangulate/) of the Delaunay triangulation algorithm and is also strongly based on [this](https://github.com/Bl4ckb0ne/delaunay-triangulation) C++ implementation. 
 
+![demo gif](https://github.com/DeveloperPaul123/delaunaypp/blob/master/media/demo.gif)
+
 ### Building
 To use the `delaunay` class all you need are the files. This is a header only library. To build the tests and the demo application you'll need CMake and Qt5. If you're on windows I recommend using [vcpkg](https://github.com/Microsoft/vcpkg). You can find instructions on how to use `vcpkg` on windows with CMake [here](https://developerpaul123.github.io/c++/using-vcpkg-on-windows/).
 
